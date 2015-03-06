@@ -12,11 +12,11 @@ as it is BIL-interleaved and contained in a continuous float array.
 
 Compiled using cmake:
 
-mkdir build
-cd build 
-cmake ..
-make
-(make install)
+1. mkdir build
+2. cd build 
+3. cmake ..
+4. make
+5. (make install)
 
 
 Requirements:
