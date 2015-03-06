@@ -146,7 +146,7 @@ int main(int argc, char *argv[]){
 
 	//start Qt app, display imageViewer widget
 	QApplication app(argc, argv);
-	ImageViewer viewer(data, newLines, newSamples, header.bands);
+	ImageViewer viewer(data, newLines, newSamples, header.bands, wlens);
 	viewer.show();
 	
 	return app.exec();
