@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(hyread)
 FIND_PACKAGE(Qt4 REQUIRED)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #QWT start
