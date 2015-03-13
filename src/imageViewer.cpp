@@ -17,6 +17,11 @@
 #include <iostream>
 using namespace std;
 
+
+bool isValidValue(float val){
+	return (0*val == 0*val); //should check for both Inf and NaN. Not sure if platform independent. 
+}
+
 /////////////////
 // ImageViewer //
 /////////////////
@@ -99,7 +104,7 @@ void ImageViewer::updateImage(int band){
 	for (int i=0; i < lines; i++){
 		for (int j=0; j < samples; j++){
 			float val = data[i*samples*bands + band*samples + j];
-			if (val*0 == val*0){ //check for NaN and Inf, in case the input image is sketchy
+			if (isValidValue(val)){ //check for NaN and Inf, in case the input image is sketchy
 				n++;
 				double delta = val - mean;
 				mean = mean + delta/(1.0f*n);
@@ -120,7 +125,7 @@ void ImageViewer::updateImage(int band){
 	}
 	std = sqrt(std/(n-1));
 	
-	if (mean == mean){
+	if (isValidValue(mean)){
 		//mean is well-defined, define new min and max from dynamic ranges
 		max = mean + 2*std;
 		min = mean - 2*std;
@@ -179,7 +184,7 @@ bool ImageViewer::eventFilter(QObject *object, QEvent *event){
 		QVector<double> wlens_vec;
 		QVector<double> spectrum_vec;
 		for (int i=0; i < bands; i++){
-			if (spectrum[i]*0 == spectrum[i]*0){
+			if (isValidValue(spectrum[i])){
 				wlens_vec.push_back(wlens[i]);
 				spectrum_vec.push_back(spectrum[i]);
 			}
