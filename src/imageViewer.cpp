@@ -87,28 +87,46 @@ void ImageViewer::getSpectrum(int x, int y, float *spec){
 
 void ImageViewer::updateImage(int band){
 	int c = 0;
-	float *imgDataTmp = new float[lines*samples*3];
-	float std = 0, mean = 0;
+	float *imgDataTmp = new float[lines*samples*3]();
+	double std = 0, mean = 0;
 	long n = 0;
+
+	float max = -1000;
+	float min = +1000;
+
 	
 	//convert to greyscale array
 	for (int i=0; i < lines; i++){
 		for (int j=0; j < samples; j++){
 			float val = data[i*samples*bands + band*samples + j];
-			n++;
-			float delta = val - mean;
-			mean = mean + delta/(1.0f*n);
-			std = std + delta*(val - mean);
-
+			if (val*0 == val*0){ //check for NaN and Inf, in case the input image is sketchy
+				n++;
+				double delta = val - mean;
+				mean = mean + delta/(1.0f*n);
+				std = std + delta*(val - mean);
+			} else {
+				val = 0;
+			}
 			imgDataTmp[c++] = val;
 			imgDataTmp[c++] = val;
 			imgDataTmp[c++] = val;
+			if (val > max){
+				max = val;
+			} 
+			if (val < min){
+				min = val;
+			}
 		}
 	}
 	std = sqrt(std/(n-1));
 	
-	float max = mean + 2*std;
-	float min = mean - 2*std;
+	if (mean == mean){
+		//mean is well-defined, define new min and max from dynamic ranges
+		max = mean + 2*std;
+		min = mean - 2*std;
+	}
+
+
 	
 	//convert to positive values, divide by largest value
 	for (int i=0; i < lines*samples*3; i++){
@@ -161,8 +179,10 @@ bool ImageViewer::eventFilter(QObject *object, QEvent *event){
 		QVector<double> wlens_vec;
 		QVector<double> spectrum_vec;
 		for (int i=0; i < bands; i++){
-			wlens_vec.push_back(wlens[i]);
-			spectrum_vec.push_back(spectrum[i]);
+			if (spectrum[i]*0 == spectrum[i]*0){
+				wlens_vec.push_back(wlens[i]);
+				spectrum_vec.push_back(spectrum[i]);
+			}
 		}
 
 		emit clickedPixel(line, pixel, wlens_vec, spectrum_vec, keepMode);
@@ -209,9 +229,9 @@ SpectrumDisplayer::SpectrumDisplayer(QWidget *parent) : QWidget(parent){
 void SpectrumDisplayer::displaySpectrum(int y, int x, QVector<double> wlens, QVector<double> intensity, KeepMode keepBehavior){
 	QwtPlotCurve *curve = new QwtPlotCurve("Line " + QString::number(y) + ", sample " + QString::number(x));
 	curve->setData(wlens, intensity);
-	curve->setPen(QColor::fromHsv(colorCtr, 255, 255));
+	curve->setPen(QColor::fromHsv(colorCtr, 255, 150));
 	curve->attach(plot);
-	colorCtr += 10;
+	colorCtr += 30;
 	if (colorCtr > 255){
 		colorCtr = 0;
 	}
