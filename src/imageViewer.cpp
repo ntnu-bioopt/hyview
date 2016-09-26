@@ -233,7 +233,7 @@ SpectrumDisplayer::SpectrumDisplayer(QWidget *parent) : QWidget(parent){
 
 void SpectrumDisplayer::displaySpectrum(int y, int x, QVector<double> wlens, QVector<double> intensity, KeepMode keepBehavior){
 	QwtPlotCurve *curve = new QwtPlotCurve("Line " + QString::number(y) + ", sample " + QString::number(x));
-	curve->setRawSamples(wlens.data(), intensity.data(), wlens.size());
+	curve->setSamples(wlens, intensity);
 	curve->setPen(QColor::fromHsv(colorCtr, 255, 150));
 	curve->attach(plot);
 	colorCtr += 30;
