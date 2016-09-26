@@ -19,7 +19,7 @@ using namespace std;
 
 
 bool isValidValue(float val){
-	return (0*val == 0*val); //should check for both Inf and NaN. Not sure if platform independent. 
+	return (0*val == 0*val); //should check for both Inf and NaN. Not sure if platform independent.
 }
 
 /////////////////
@@ -34,14 +34,14 @@ ImageViewer::ImageViewer(float *data, int lines, int samples, int bands, vector<
 	QScrollBar *bandChooser = new QScrollBar;
 	bandChooser->setMaximum(bands-1);
 	connect(bandChooser, SIGNAL(valueChanged(int)), SLOT(updateImage(int)));
-	
+
 	//layout
 	QGridLayout *layout = new QGridLayout(this);
 	layout->addWidget(bandChooser, 0, 1);
 	updateImage(0);
 	QScrollArea *area = new QScrollArea;
 	layout->addWidget(area, 0, 0);
-	
+
 	imageLabel->setBackgroundRole(QPalette::Base);
 	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	area->setWidget(imageLabel);
@@ -60,28 +60,28 @@ ImageViewer::ImageViewer(float *data, int lines, int samples, int bands, vector<
 	spectrumDisplayer->show();
 	#endif
 }
-		
-		
+
+
 
 void ImageViewer::paintEvent(QPaintEvent *evt){
 	Q_UNUSED(evt);
-	
+
 	//scale QImage to current widget size
 	QImage resImage;
 	int imHeight = currImage.height();
 	int imWidth = currImage.width();
 	resImage = currImage.scaledToWidth(size().width()-30);
-	
+
 	//update scaling factors
 	int newHeight = resImage.height();
 	int newWidth = resImage.width();
 	widthScale = imWidth*1.0f/(newWidth*1.0f);
 	heightScale = imHeight*1.0f/(newHeight*1.0f);
-	
+
 	//update label with current pixmap
 	this->imageLabel->setPixmap(QPixmap::fromImage(resImage));
 	this->imageLabel->adjustSize();
-	
+
 }
 
 void ImageViewer::getSpectrum(int x, int y, float *spec){
@@ -99,7 +99,7 @@ void ImageViewer::updateImage(int band){
 	float max = -1000;
 	float min = +1000;
 
-	
+
 	//convert to greyscale array
 	for (int i=0; i < lines; i++){
 		for (int j=0; j < samples; j++){
@@ -117,14 +117,14 @@ void ImageViewer::updateImage(int band){
 			imgDataTmp[c++] = val;
 			if (val > max){
 				max = val;
-			} 
+			}
 			if (val < min){
 				min = val;
 			}
 		}
 	}
 	std = sqrt(std/(n-1));
-	
+
 	if (isValidValue(mean)){
 		//mean is well-defined, define new min and max from dynamic ranges
 		max = mean + 2*std;
@@ -132,7 +132,7 @@ void ImageViewer::updateImage(int band){
 	}
 
 
-	
+
 	//convert to positive values, divide by largest value
 	for (int i=0; i < lines*samples*3; i++){
 		if (imgDataTmp[i] > (mean + 2*std)){
@@ -155,7 +155,7 @@ void ImageViewer::updateImage(int band){
 		emit newBand(wlens[band]);
 	}
 }
-		
+
 void ImageViewer::saveImage(int band, string bandimagename){
 	updateImage(band);
 	currImage.save(QString::fromStdString(bandimagename));
@@ -168,7 +168,7 @@ bool ImageViewer::eventFilter(QObject *object, QEvent *event){
 	if ((event->type() == QEvent::MouseButtonPress)){
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 		KeepMode keepMode = DELETE_PREVIOUS_SPECTRA;
-		
+
 		if (mouseEvent->modifiers() == Qt::ControlModifier){
 			//ctrl was pressed. Keep previous spectra
 			keepMode = KEEP_PREVIOUS_SPECTRA;
@@ -192,7 +192,7 @@ bool ImageViewer::eventFilter(QObject *object, QEvent *event){
 
 		emit clickedPixel(line, pixel, wlens_vec, spectrum_vec, keepMode);
 		delete [] spectrum;
-	} 
+	}
 	return false;
 }
 
@@ -214,7 +214,7 @@ bool ImageViewer::eventFilter(QObject *object, QEvent *event){
 
 SpectrumDisplayer::SpectrumDisplayer(QWidget *parent) : QWidget(parent){
 	this->setWindowTitle("Spectra");
-	
+
 	plot = new QwtPlot(this);
 	plot->setAxisTitle(QwtPlot::yLeft, "Pixel intensity");
 	plot->setAxisTitle(QwtPlot::xBottom, "Wavelength (nm)");
@@ -230,7 +230,7 @@ SpectrumDisplayer::SpectrumDisplayer(QWidget *parent) : QWidget(parent){
 	vertLine->setLineStyle(QwtPlotMarker::VLine);
 	vertLine->attach(plot);
 }
-		
+
 void SpectrumDisplayer::displaySpectrum(int y, int x, QVector<double> wlens, QVector<double> intensity, KeepMode keepBehavior){
 	QwtPlotCurve *curve = new QwtPlotCurve("Line " + QString::number(y) + ", sample " + QString::number(x));
 	curve->setRawSamples(wlens.data(), intensity.data(), wlens.size());
@@ -253,7 +253,7 @@ void SpectrumDisplayer::displaySpectrum(int y, int x, QVector<double> wlens, QVe
 	plot->replot();
 
 }
-		
+
 void SpectrumDisplayer::setVerticalLine(float wavelength){
 	vertLine->setXValue(wavelength);
 	plot->replot();
