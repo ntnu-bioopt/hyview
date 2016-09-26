@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================================================
 
-#include <readimage.h>
+#include "readimage.h"
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -106,7 +106,7 @@ int main(int argc, char *argv[]){
 	}
 	char *filename = argv[optind];
 	if (filename == NULL){
-		cerr << "Missing filename!" << endl;
+		cerr << "Filename missing." << endl;
 		exit(1);
 	}
 	
